@@ -24,3 +24,9 @@ class AssignmentSubmissionResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+class AssignmentSubmissionUpdate(BaseModel):
+    fileUrl: Optional[str] = None
+    obtainedMarks: Optional[int] = None
+    feedback: Optional[str] = None
+    gradedAt: Optional[datetime] = None

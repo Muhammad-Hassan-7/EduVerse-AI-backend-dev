@@ -16,7 +16,6 @@ router = APIRouter(
     tags=["Assignment Submissions"]
 )
 
-# Utility to validate ObjectId
 def validate_object_id(id: str):
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail="Invalid ObjectId format")

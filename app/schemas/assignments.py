@@ -19,15 +19,15 @@ class AssignmentCreate(BaseModel):
 
 
 class AssignmentUpdate(BaseModel):
-    title: Optional[str]
-    description: Optional[str]
-    dueDate: Optional[datetime]
-    totalMarks: Optional[int]
-    passingMarks: Optional[int]
-    status: Optional[str]
-    dueTime: Optional[datetime]
-    fileUrl: Optional[str]
-    allowedFormats: Optional[List[str]]
+    title: Optional[str] = None
+    description: Optional[str] = None
+    dueDate: Optional[datetime] = None
+    totalMarks: Optional[int] = None
+    passingMarks: Optional[int] = None
+    status: Optional[str] = None
+    dueTime: Optional[datetime] = None
+    fileUrl: Optional[str] = None
+    allowedFormats: Optional[List[str]] = None
 
 
 class AssignmentResponse(BaseModel):

@@ -1,4 +1,4 @@
-
+from typing import Optional
 from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 
@@ -20,11 +20,10 @@ from app.crud.assignments import (
 
 router = APIRouter(prefix="/assignments", tags=["Assignments"])
 
-
 def clean_updates(data: dict):
     cleaned = {}
     for k, v in data.items():
-        if v in [None, "", [], {}, 0]:
+        if v in [None, "", [], {}]:
             continue 
         cleaned[k] = v
     return cleaned
@@ -37,11 +36,9 @@ def validate_object_id(id: str, name: str = "id"):
             detail=f"Invalid ObjectId format for {name}"
         )
 
-
 @router.post("/", response_model=AssignmentResponse)
 async def create_assignment_route(data: AssignmentCreate):
-
-
+    
     validate_object_id(data.courseId, "courseId")
     validate_object_id(data.teacherId, "teacherId")
     validate_object_id(data.tenantId, "tenantId")
@@ -94,13 +91,11 @@ async def get_assignment_route(id: str):
     if not assignment:
         raise HTTPException(404, "Assignment not found")
 
-    return assignment
-
-
+    return assignment;
 
 
 @router.put("/{id}", response_model=AssignmentResponse)
-async def update_assignment_route(id: str, teacherId: str, updates: AssignmentUpdate):
+async def update_assignment_route(id: str, teacherId: str, updates: Optional[AssignmentUpdate] = None):
 
     validate_object_id(id, "assignmentId")
     validate_object_id(teacherId, "teacherId")
