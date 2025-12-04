@@ -1,86 +1,86 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
+# from fastapi.security import OAuth2PasswordBearer
+# from jose import jwt
 from bson import ObjectId
 from datetime import datetime
-import os
+# import os
 from dotenv import load_dotenv
 
-from app.schemas.admins import (
-    AdminCreate,
-    AdminLogin,
-    AdminResponse,
-    AdminUpdateProfile,
-    AdminUpdatePassword
-)
+# from app.schemas.admins import (
+#     AdminCreate,
+#     AdminLogin,
+#     AdminResponse,
+#     AdminUpdateProfile,
+#     AdminUpdatePassword
+# )
 from app.crud import admins as crud_admin
 
 load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY", "secret123")
+# SECRET_KEY = os.getenv("SECRET_KEY", "secret123")
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="admin/login")
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="admin/login")
 
 # ------------------ Auth ------------------
 
-@router.post("/signup", response_model=AdminResponse)
-async def signup(admin: AdminCreate):
-    try:
-        new_admin = await crud_admin.create_admin(admin)
-        return AdminResponse(**new_admin)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+# @router.post("/signup", response_model=AdminResponse)
+# async def signup(admin: AdminCreate):
+#     try:
+#         new_admin = await crud_admin.create_admin(admin)
+#         return AdminResponse(**new_admin)
+#     except ValueError as e:
+#         raise HTTPException(status_code=400, detail=str(e))
 
-@router.post("/login")
-async def login(admin: AdminLogin):
-    db_admin = await crud_admin.get_admin_by_email(admin.email)
-    if not db_admin:
-        raise HTTPException(status_code=404, detail="Admin not found")
-    if not await crud_admin.verify_password(admin.password, db_admin["password"]):
-        raise HTTPException(status_code=400, detail="Invalid password")
+# @router.post("/login")
+# async def login(admin: AdminLogin):
+#     db_admin = await crud_admin.get_admin_by_email(admin.email)
+#     if not db_admin:
+#         raise HTTPException(status_code=404, detail="Admin not found")
+#     if not await crud_admin.verify_password(admin.password, db_admin["password"]):
+#         raise HTTPException(status_code=400, detail="Invalid password")
 
-    token = jwt.encode({"admin_id": str(db_admin["_id"])}, SECRET_KEY)
-    return {
-        "token": token,
-        "admin": {
-            "id": str(db_admin["_id"]),
-            "fullName": db_admin["fullName"],
-            "email": db_admin["email"]
-        }
-    }
+#     token = jwt.encode({"admin_id": str(db_admin["_id"])}, SECRET_KEY)
+#     return {
+#         "token": token,
+#         "admin": {
+#             "id": str(db_admin["_id"]),
+#             "fullName": db_admin["fullName"],
+#             "email": db_admin["email"]
+#         }
+#     }
 
 # ------------------ Profile ------------------
 
-@router.get("/profile", response_model=AdminResponse)
-async def get_profile(token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, SECRET_KEY)
-        admin_id = payload.get("admin_id")
-    except:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    admin = await crud_admin.db.admins.find_one({"_id": ObjectId(admin_id)})
-    if not admin:
-        raise HTTPException(status_code=404, detail="Admin not found")
-    return AdminResponse(**crud_admin.serialize_admin(admin))
+# @router.get("/profile", response_model=AdminResponse)
+# async def get_profile(token: str = Depends(oauth2_scheme)):
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY)
+#         admin_id = payload.get("admin_id")
+#     except:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+#     admin = await crud_admin.db.admins.find_one({"_id": ObjectId(admin_id)})
+#     if not admin:
+#         raise HTTPException(status_code=404, detail="Admin not found")
+#     return AdminResponse(**crud_admin.serialize_admin(admin))
 
-@router.patch("/update-profile", response_model=AdminResponse)
-async def update_profile(data: AdminUpdateProfile, token: str = Depends(oauth2_scheme)):
-    payload = jwt.decode(token, SECRET_KEY)
-    admin_id = payload.get("admin_id")
-    updated_admin = await crud_admin.update_admin_profile(admin_id, data)
-    if not updated_admin:
-        raise HTTPException(status_code=400, detail="Nothing to update")
-    return AdminResponse(**updated_admin)
+# @router.patch("/update-profile", response_model=AdminResponse)
+# async def update_profile(data: AdminUpdateProfile, token: str = Depends(oauth2_scheme)):
+#     payload = jwt.decode(token, SECRET_KEY)
+#     admin_id = payload.get("admin_id")
+#     updated_admin = await crud_admin.update_admin_profile(admin_id, data)
+#     if not updated_admin:
+#         raise HTTPException(status_code=400, detail="Nothing to update")
+#     return AdminResponse(**updated_admin)
 
-@router.patch("/update-password")
-async def update_password(data: AdminUpdatePassword, token: str = Depends(oauth2_scheme)):
-    payload = jwt.decode(token, SECRET_KEY)
-    admin_id = payload.get("admin_id")
-    try:
-        await crud_admin.update_admin_password(admin_id, data.oldPassword, data.newPassword)
-        return {"message": "Password updated successfully"}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+# @router.patch("/update-password")
+# async def update_password(data: AdminUpdatePassword, token: str = Depends(oauth2_scheme)):
+#     payload = jwt.decode(token, SECRET_KEY)
+#     admin_id = payload.get("admin_id")
+#     try:
+#         await crud_admin.update_admin_password(admin_id, data.oldPassword, data.newPassword)
+#         return {"message": "Password updated successfully"}
+#     except ValueError as e:
+#         raise HTTPException(status_code=400, detail=str(e))
 
 # ------------------ Dashboard ------------------
 
